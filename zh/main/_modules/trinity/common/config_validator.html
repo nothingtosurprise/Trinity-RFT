@@ -824,7 +824,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../build_api/trinity.common.rewards.qwen25_eval.html">trinity.common.rewards.qwen25_eval module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../build_api/trinity.common.rewards.reward_fn.html">trinity.common.rewards.reward_fn module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../build_api/trinity.common.rewards.tool_reward.html">trinity.common.rewards.tool_reward module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../build_api/trinity.common.rewards.utils.html">trinity.common.rewards.utils module</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../build_api/trinity.common.workflows.html">trinity.common.workflows package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -847,6 +846,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../build_api/trinity.common.config_validator.html">trinity.common.config_validator module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../build_api/trinity.common.constants.html">trinity.common.constants module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../build_api/trinity.common.experience.html">trinity.common.experience module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../build_api/trinity.common.experience_visualizer.html">trinity.common.experience_visualizer module</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../build_api/trinity.utils.html">trinity.utils package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1714,12 +1714,15 @@ window.runMermaid = runMermaid;</script>
             <span class="k">for</span> <span class="n">args</span> <span class="ow">in</span> <span class="n">model_args</span><span class="p">:</span>
                 <span class="n">set_if_none</span><span class="p">(</span><span class="n">aux_model</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">explorer</span><span class="o">.</span><span class="n">over_rollout</span><span class="o">.</span><span class="n">ratio</span> <span class="o">&gt;</span> <span class="mf">0.0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">explorer</span><span class="o">.</span><span class="n">over_rollout</span><span class="o">.</span><span class="n">ratio</span> <span class="o">&gt;</span> <span class="mf">0.0</span>
+            <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">explorer</span><span class="o">.</span><span class="n">over_rollout</span><span class="o">.</span><span class="n">return_partial_tasks</span>
+        <span class="p">):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="mf">0.0</span> <span class="o">&lt;=</span> <span class="n">config</span><span class="o">.</span><span class="n">explorer</span><span class="o">.</span><span class="n">over_rollout</span><span class="o">.</span><span class="n">ratio</span> <span class="o">&lt;</span> <span class="mf">1.0</span><span class="p">):</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;over_rollout_ratio should be in [0.0, 1.0)&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">synchronizer</span><span class="o">.</span><span class="n">sync_style</span> <span class="o">==</span> <span class="n">SyncStyle</span><span class="o">.</span><span class="n">FIXED</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="s2">&quot;over_rollout_ratio is not compatible with fixed sync_style, please set &quot;</span>
+                    <span class="s2">&quot;over_rollout is not compatible with fixed sync_style, please set &quot;</span>
                     <span class="s2">&quot;`synchronizer.sync_style` to `explorer_driven` or `trainer_driven`.&quot;</span>
                 <span class="p">)</span>
 

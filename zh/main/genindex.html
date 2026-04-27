@@ -824,7 +824,6 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l4"><a class="reference internal" href="build_api/trinity.common.rewards.qwen25_eval.html">trinity.common.rewards.qwen25_eval module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="build_api/trinity.common.rewards.reward_fn.html">trinity.common.rewards.reward_fn module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="build_api/trinity.common.rewards.tool_reward.html">trinity.common.rewards.tool_reward module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="build_api/trinity.common.rewards.utils.html">trinity.common.rewards.utils module</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3 has-children"><a class="reference internal" href="build_api/trinity.common.workflows.html">trinity.common.workflows package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -847,6 +846,7 @@ window.runMermaid = runMermaid;</script>
 <li class="toctree-l3"><a class="reference internal" href="build_api/trinity.common.config_validator.html">trinity.common.config_validator module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="build_api/trinity.common.constants.html">trinity.common.constants module</a></li>
 <li class="toctree-l3"><a class="reference internal" href="build_api/trinity.common.experience.html">trinity.common.experience module</a></li>
+<li class="toctree-l3"><a class="reference internal" href="build_api/trinity.common.experience_visualizer.html">trinity.common.experience_visualizer module</a></li>
 </ul>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="build_api/trinity.utils.html">trinity.utils package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
@@ -1273,10 +1273,10 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.OperatorConfig.__init__">__init__() （trinity.common.config.OperatorConfig 方法）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.OptimizerConfig.__init__">__init__() （trinity.common.config.OptimizerConfig 方法）</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.OverRolloutConfig.__init__">__init__() （trinity.common.config.OverRolloutConfig 方法）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.ReplayBufferConfig.__init__">__init__() （trinity.common.config.ReplayBufferConfig 方法）</a>
@@ -1307,6 +1307,10 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience.__init__">__init__() （trinity.common.experience.Experience 方法）</a>
 </li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenView.__init__">__init__() （trinity.common.experience_visualizer.ExperienceTokenView 方法）</a>
+</li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenViewItem.__init__">__init__() （trinity.common.experience_visualizer.ExperienceTokenViewItem 方法）</a>
+</li>
       <li><a href="build_api/trinity.common.models.external_model.html#trinity.common.models.external_model.ExternalModel.__init__">__init__() （trinity.common.models.external_model.ExternalModel 方法）</a>
 </li>
       <li><a href="build_api/trinity.common.models.model.html#trinity.common.models.model.BaseInferenceModel.__init__">__init__() （trinity.common.models.model.BaseInferenceModel 方法）</a>
@@ -1332,8 +1336,6 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.common.rewards.math_reward.html#trinity.common.rewards.math_reward.MathRewardFn.__init__">__init__() （trinity.common.rewards.math_reward.MathRewardFn 方法）</a>
 </li>
       <li><a href="build_api/trinity.common.rewards.reward_fn.html#trinity.common.rewards.reward_fn.RewardFn.__init__">__init__() （trinity.common.rewards.reward_fn.RewardFn 方法）</a>
-</li>
-      <li><a href="build_api/trinity.common.rewards.reward_fn.html#trinity.common.rewards.reward_fn.RMGalleryFn.__init__">__init__() （trinity.common.rewards.reward_fn.RMGalleryFn 方法）</a>
 </li>
       <li><a href="build_api/trinity.common.rewards.html#trinity.common.rewards.RewardFn.__init__">__init__() （trinity.common.rewards.RewardFn 方法）</a>
 </li>
@@ -1398,6 +1400,8 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.TaskWrapper.__init__">__init__() （trinity.explorer.scheduler.TaskWrapper 方法）</a>
 </li>
       <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.DebugWorkflowRunner.__init__">__init__() （trinity.explorer.workflow_runner.DebugWorkflowRunner 方法）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.RunnerExecutionResult.__init__">__init__() （trinity.explorer.workflow_runner.RunnerExecutionResult 方法）</a>
 </li>
       <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.Status.__init__">__init__() （trinity.explorer.workflow_runner.Status 方法）</a>
 </li>
@@ -1713,10 +1717,10 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.ExplorerConfig.bench_on_latest_checkpoint">bench_on_latest_checkpoint（trinity.common.config.ExplorerConfig 属性）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.explorer.html#trinity.explorer.Explorer.benchmark">benchmark() （trinity.explorer.Explorer 方法）</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.explorer.explorer.html#trinity.explorer.explorer.Explorer.benchmark">benchmark() （trinity.explorer.explorer.Explorer 方法）</a>
 </li>
       <li><a href="build_api/trinity.buffer.selector.difficulty_estimator.html#trinity.buffer.selector.difficulty_estimator.BaseBetaPREstimator.betas">betas（trinity.buffer.selector.difficulty_estimator.BaseBetaPREstimator 属性）</a>
@@ -1748,6 +1752,8 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.StageConfig.buffer">buffer（trinity.common.config.StageConfig 属性）</a>
 </li>
       <li><a href="build_api/trinity.buffer.selector.selector.html#trinity.buffer.selector.selector.DifficultyBasedSelector.build_diff_estimator">build_diff_estimator() （trinity.buffer.selector.selector.DifficultyBasedSelector 方法）</a>
+</li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.build_experience_token_view">build_experience_token_view()（在 trinity.common.experience_visualizer 模块中）</a>
 </li>
       <li><a href="build_api/trinity.common.models.mm_utils.html#trinity.common.models.mm_utils.build_mm_input_for_training">build_mm_input_for_training()（在 trinity.common.models.mm_utils 模块中）</a>
 </li>
@@ -1993,10 +1999,10 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.models.model.html#trinity.common.models.model.ModelWrapper.clone_with_isolated_history">clone_with_isolated_history() （trinity.common.models.model.ModelWrapper 方法）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.buffer.operators.data_juicer_operator.html#trinity.buffer.operators.data_juicer_operator.DataJuicerOperator.close">close() （trinity.buffer.operators.data_juicer_operator.DataJuicerOperator 方法）</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.buffer.operators.experience_operator.html#trinity.buffer.operators.experience_operator.ExperienceOperator.close">close() （trinity.buffer.operators.experience_operator.ExperienceOperator 方法）</a>
 </li>
       <li><a href="build_api/trinity.buffer.operators.experience_operator.html#trinity.buffer.operators.experience_operator.ExperienceOperatorV1.close">close() （trinity.buffer.operators.experience_operator.ExperienceOperatorV1 方法）</a>
@@ -2054,6 +2060,10 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.explorer.proxy.client.html#trinity.explorer.proxy.client.TrinityClient.commit">commit() （trinity.explorer.proxy.client.TrinityClient 方法）</a>
 </li>
       <li><a href="build_api/trinity.explorer.proxy.client.html#trinity.explorer.proxy.client.TrinityClient.commit_async">commit_async() （trinity.explorer.proxy.client.TrinityClient 方法）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.TaskWrapper.completed_runs">completed_runs（trinity.explorer.scheduler.TaskWrapper 属性）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.Status.completed_runs">completed_runs（trinity.explorer.workflow_runner.Status 属性）</a>
 </li>
       <li><a href="build_api/trinity.algorithm.algorithm.html#trinity.algorithm.algorithm.AlgorithmType.compute_advantage_in_trainer">compute_advantage_in_trainer（trinity.algorithm.algorithm.AlgorithmType 属性）</a>
 </li>
@@ -2517,6 +2527,8 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience.eid">eid（trinity.common.experience.Experience 属性）</a>
 </li>
+      <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.TaskWrapper.emitted">emitted（trinity.explorer.scheduler.TaskWrapper 属性）</a>
+</li>
       <li><a href="build_api/trinity.trainer.verl.verl_config.html#trinity.trainer.verl.verl_config.ActorModel.enable_activation_offload">enable_activation_offload（trinity.trainer.verl.verl_config.ActorModel 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.InferenceModelConfig.enable_auto_tool_choice">enable_auto_tool_choice（trinity.common.config.InferenceModelConfig 属性）</a>
@@ -2625,10 +2637,10 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.LoRAConfig.exclude_modules">exclude_modules（trinity.common.config.LoRAConfig 属性）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.trainer.verl.verl_config.html#trinity.trainer.verl.verl_config.ActorModel.exclude_modules">exclude_modules（trinity.trainer.verl.verl_config.ActorModel 属性）</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.TrainerInput.experience_buffer">experience_buffer（trinity.common.config.TrainerInput 属性）</a>
 </li>
       <li><a href="build_api/trinity.buffer.schema.sql_schema.html#trinity.buffer.schema.sql_schema.DPODataModel.experience_bytes">experience_bytes（trinity.buffer.schema.sql_schema.DPODataModel 属性）</a>
@@ -2662,6 +2674,14 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.buffer.pipelines.html#trinity.buffer.pipelines.ExperiencePipeline">ExperiencePipeline（trinity.buffer.pipelines 中的类）</a>
 </li>
       <li><a href="build_api/trinity.buffer.pipelines.experience_pipeline.html#trinity.buffer.pipelines.experience_pipeline.ExperiencePipeline">ExperiencePipeline（trinity.buffer.pipelines.experience_pipeline 中的类）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.TaskWrapper.experiences">experiences（trinity.explorer.scheduler.TaskWrapper 属性）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.RunnerExecutionResult.experiences">experiences（trinity.explorer.workflow_runner.RunnerExecutionResult 属性）</a>
+</li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenViewItem">ExperienceTokenViewItem（trinity.common.experience_visualizer 中的类）</a>
+</li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenView">ExperienceTokenView（trinity.common.experience_visualizer 中的类）</a>
 </li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience">Experience（trinity.common.experience 中的类）</a>
 </li>
@@ -2789,6 +2809,10 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.explorer.explorer.html#trinity.explorer.explorer.Explorer.finish_current_steps">finish_current_steps() （trinity.explorer.explorer.Explorer 方法）</a>
 </li>
+      <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.TaskWrapper.finished_sub_task_num">finished_sub_task_num（trinity.explorer.scheduler.TaskWrapper 属性）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.TaskWrapper.first_error">first_error（trinity.explorer.scheduler.TaskWrapper 属性）</a>
+</li>
       <li><a href="build_api/trinity.common.rewards.qwen25_eval.html#trinity.common.rewards.qwen25_eval.fix_a_slash_b">fix_a_slash_b()（在 trinity.common.rewards.qwen25_eval 模块中）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.TrainerConfig.fix_actor_microbatch_loss_scale">fix_actor_microbatch_loss_scale（trinity.common.config.TrainerConfig 属性）</a>
@@ -2819,6 +2843,8 @@ window.runMermaid = runMermaid;</script>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.format_experience_colored_tokens">format_experience_colored_tokens()（在 trinity.common.experience_visualizer 模块中）</a>
+</li>
       <li><a href="build_api/trinity.common.workflows.eval_workflow.html#trinity.common.workflows.eval_workflow.MathEvalWorkflow.format_messages">format_messages() （trinity.common.workflows.eval_workflow.MathEvalWorkflow 方法）</a>
 </li>
       <li><a href="build_api/trinity.common.workflows.on_policy_distill_workflow.html#trinity.common.workflows.on_policy_distill_workflow.OnPolicyDistillMathWorkflow.format_messages">format_messages() （trinity.common.workflows.on_policy_distill_workflow.OnPolicyDistillMathWorkflow 方法）</a>
@@ -3229,6 +3255,8 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.TasksetConfig.index">index（trinity.common.config.TasksetConfig 属性）</a>
 </li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenViewItem.index">index（trinity.common.experience_visualizer.ExperienceTokenViewItem 属性）</a>
+</li>
       <li><a href="build_api/trinity.common.workflows.html#trinity.common.workflows.Task.index">index（trinity.common.workflows.Task 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.workflows.workflow.html#trinity.common.workflows.workflow.Task.index">index（trinity.common.workflows.workflow.Task 属性）</a>
@@ -3267,9 +3295,11 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.config_validator.html#trinity.common.config_validator.IntervalConfigValidator">IntervalConfigValidator（trinity.common.config_validator 中的类）</a>
 </li>
+      <li><a href="build_api/trinity.buffer.operators.filters.reward_filter.html#trinity.buffer.operators.filters.reward_filter.InvalidRewardFilter">InvalidRewardFilter（trinity.buffer.operators.filters.reward_filter 中的类）</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="build_api/trinity.buffer.operators.filters.reward_filter.html#trinity.buffer.operators.filters.reward_filter.InvalidRewardFilter">InvalidRewardFilter（trinity.buffer.operators.filters.reward_filter 中的类）</a>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenViewItem.is_action">is_action（trinity.common.experience_visualizer.ExperienceTokenViewItem 属性）</a>
 </li>
       <li><a href="build_api/trinity.explorer.html#trinity.explorer.Explorer.is_alive">is_alive() （trinity.explorer.Explorer 方法）</a>
 </li>
@@ -3330,6 +3360,8 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.buffer.storage.queue.html#trinity.buffer.storage.queue.is_json_file">is_json_file()（在 trinity.buffer.storage.queue 模块中）</a>
 </li>
       <li><a href="build_api/trinity.utils.distributed.html#trinity.utils.distributed.is_port_available">is_port_available()（在 trinity.utils.distributed 模块中）</a>
+</li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenViewItem.is_prompt">is_prompt（trinity.common.experience_visualizer.ExperienceTokenViewItem 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.models.mm_utils.html#trinity.common.models.mm_utils.is_qwen_like_processor">is_qwen_like_processor()（在 trinity.common.models.mm_utils 模块中）</a>
 </li>
@@ -3555,6 +3587,8 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience.logprobs">logprobs（trinity.common.experience.Experience 属性）</a>
 </li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenViewItem.logprob">logprob（trinity.common.experience_visualizer.ExperienceTokenViewItem 属性）</a>
+</li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.Config.log">log（trinity.common.config.Config 属性）</a>
 </li>
       <li><a href="build_api/trinity.trainer.verl.verl_config.html#trinity.trainer.verl.verl_config.ActorModel.lora_adapter_path">lora_adapter_path（trinity.trainer.verl.verl_config.ActorModel 属性）</a>
@@ -3728,6 +3762,8 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.Status.message">message（trinity.explorer.workflow_runner.Status 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience.metrics">metrics（trinity.common.experience.Experience 属性）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.TaskWrapper.metrics">metrics（trinity.explorer.scheduler.TaskWrapper 属性）</a>
 </li>
       <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.Status.metrics">metrics（trinity.explorer.workflow_runner.Status 属性）</a>
 </li>
@@ -3989,6 +4025,8 @@ window.runMermaid = runMermaid;</script>
 </li>
         <li><a href="build_api/trinity.common.experience.html#module-trinity.common.experience">trinity.common.experience</a>
 </li>
+        <li><a href="build_api/trinity.common.experience_visualizer.html#module-trinity.common.experience_visualizer">trinity.common.experience_visualizer</a>
+</li>
         <li><a href="build_api/trinity.common.models.html#module-trinity.common.models">trinity.common.models</a>
 </li>
         <li><a href="build_api/trinity.common.models.external_model.html#module-trinity.common.models.external_model">trinity.common.models.external_model</a>
@@ -4032,8 +4070,6 @@ window.runMermaid = runMermaid;</script>
         <li><a href="build_api/trinity.common.rewards.reward_fn.html#module-trinity.common.rewards.reward_fn">trinity.common.rewards.reward_fn</a>
 </li>
         <li><a href="build_api/trinity.common.rewards.tool_reward.html#module-trinity.common.rewards.tool_reward">trinity.common.rewards.tool_reward</a>
-</li>
-        <li><a href="build_api/trinity.common.rewards.utils.html#module-trinity.common.rewards.utils">trinity.common.rewards.utils</a>
 </li>
         <li><a href="build_api/trinity.common.workflows.html#module-trinity.common.workflows">trinity.common.workflows</a>
 </li>
@@ -4482,15 +4518,17 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.trainer.html#trinity.trainer.Trainer.prepare">prepare() （trinity.trainer.Trainer 方法）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.trainer.trainer.html#trinity.trainer.trainer.TrainEngineWrapper.prepare">prepare() （trinity.trainer.trainer.TrainEngineWrapper 方法）</a>
 </li>
       <li><a href="build_api/trinity.trainer.trainer.html#trinity.trainer.trainer.Trainer.prepare">prepare() （trinity.trainer.trainer.Trainer 方法）</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.trainer.verl.verl_trainer.html#trinity.trainer.verl.verl_trainer.VerlPPOTrainerWrapper.prepare">prepare() （trinity.trainer.verl.verl_trainer.VerlPPOTrainerWrapper 方法）</a>
 </li>
       <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.Scheduler.print_all_state">print_all_state() （trinity.explorer.scheduler.Scheduler 方法）</a>
+</li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.print_experience_colored_tokens">print_experience_colored_tokens()（在 trinity.common.experience_visualizer 模块中）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.ReplayBufferConfig.priority_fn_args">priority_fn_args（trinity.common.config.ReplayBufferConfig 属性）</a>
 </li>
@@ -4580,7 +4618,13 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience.prompt_length">prompt_length（trinity.common.experience.Experience 属性）</a>
 </li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenView.prompt_length">prompt_length（trinity.common.experience_visualizer.ExperienceTokenView 属性）</a>
+</li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience.prompt_text">prompt_text（trinity.common.experience.Experience 属性）</a>
+</li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenView.prompt_text">prompt_text（trinity.common.experience_visualizer.ExperienceTokenView 属性）</a>
+</li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenView.prompt_tokens">prompt_tokens（trinity.common.experience_visualizer.ExperienceTokenView 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.FormatConfig.prompt_type">prompt_type（trinity.common.config.FormatConfig 属性）</a>
 </li>
@@ -4846,10 +4890,10 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.workflows.workflow.html#trinity.common.workflows.workflow.Workflow.resettable">resettable（trinity.common.workflows.workflow.Workflow 属性）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.manager.log_manager.html#trinity.manager.log_manager.Colors.RESET">RESET（trinity.manager.log_manager.Colors 属性）</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.trainer.verl.verl_config.html#trinity.trainer.verl.verl_config.FSDPConfig.reshard_after_forward">reshard_after_forward（trinity.trainer.verl.verl_config.FSDPConfig 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.FormatConfig.response_key">response_key（trinity.common.config.FormatConfig 属性）</a>
@@ -4858,9 +4902,11 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience.response_text">response_text（trinity.common.experience.Experience 属性）</a>
 </li>
-      <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.RunnerWrapper.restart_runner">restart_runner() （trinity.explorer.scheduler.RunnerWrapper 方法）</a>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenView.response_text">response_text（trinity.common.experience_visualizer.ExperienceTokenView 属性）</a>
 </li>
-      <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.TaskWrapper.results">results（trinity.explorer.scheduler.TaskWrapper 属性）</a>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenView.response_tokens">response_tokens（trinity.common.experience_visualizer.ExperienceTokenView 属性）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.RunnerWrapper.restart_runner">restart_runner() （trinity.explorer.scheduler.RunnerWrapper 方法）</a>
 </li>
       <li><a href="build_api/trinity.common.workflows.agentscope.react.templates.html#trinity.common.workflows.agentscope.react.templates.GSM8KResponseStructure.result">result（trinity.common.workflows.agentscope.react.templates.GSM8KResponseStructure 属性）</a>
 </li>
@@ -4869,6 +4915,8 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.trainer.verl.verl_config.html#trinity.trainer.verl.verl_config.Trainer.resume_mode">resume_mode（trinity.trainer.verl.verl_config.Trainer 属性）</a>
 </li>
       <li><a href="build_api/trinity.buffer.utils.html#trinity.buffer.utils.retry_session">retry_session()（在 trinity.buffer.utils 模块中）</a>
+</li>
+      <li><a href="build_api/trinity.common.config.html#trinity.common.config.OverRolloutConfig.return_partial_tasks">return_partial_tasks（trinity.common.config.OverRolloutConfig 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience.returns">returns（trinity.common.experience.Experience 属性）</a>
 </li>
@@ -4935,8 +4983,6 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.algorithm.advantage_fn.rloo_advantage.html#trinity.algorithm.advantage_fn.rloo_advantage.RLOOAdvantageFn">RLOOAdvantageFn（trinity.algorithm.advantage_fn.rloo_advantage 中的类）</a>
 </li>
       <li><a href="build_api/trinity.algorithm.algorithm.html#trinity.algorithm.algorithm.RLOOAlgorithm">RLOOAlgorithm（trinity.algorithm.algorithm 中的类）</a>
-</li>
-      <li><a href="build_api/trinity.common.rewards.reward_fn.html#trinity.common.rewards.reward_fn.RMGalleryFn">RMGalleryFn（trinity.common.rewards.reward_fn 中的类）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.StorageConfig.rollout_args">rollout_args（trinity.common.config.StorageConfig 属性）</a>
 </li>
@@ -5057,6 +5103,8 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.ExplorerConfig.runner_per_model">runner_per_model（trinity.common.config.ExplorerConfig 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.ExplorerConfig.runner_state_report_interval">runner_state_report_interval（trinity.common.config.ExplorerConfig 属性）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.RunnerExecutionResult">RunnerExecutionResult（trinity.explorer.workflow_runner 中的类）</a>
 </li>
       <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.RunnerWrapper">RunnerWrapper（trinity.explorer.scheduler 中的类）</a>
 </li>
@@ -5490,10 +5538,10 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.manager.config_registry.trainer_config_manager.html#trinity.manager.config_registry.trainer_config_manager.set_norm_adv_by_std_in_grpo">set_norm_adv_by_std_in_grpo()（在 trinity.manager.config_registry.trainer_config_manager 模块中）</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.manager.config_registry.trainer_config_manager.html#trinity.manager.config_registry.trainer_config_manager.set_offload_policy">set_offload_policy()（在 trinity.manager.config_registry.trainer_config_manager 模块中）</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="build_api/trinity.manager.config_registry.algorithm_config_manager.html#trinity.manager.config_registry.algorithm_config_manager.set_opmd_baseline_in_advantage_fn">set_opmd_baseline_in_advantage_fn()（在 trinity.manager.config_registry.algorithm_config_manager 模块中）</a>
 </li>
       <li><a href="build_api/trinity.manager.config_registry.trainer_config_manager.html#trinity.manager.config_registry.trainer_config_manager.set_optimizer_offload">set_optimizer_offload()（在 trinity.manager.config_registry.trainer_config_manager 模块中）</a>
@@ -5776,6 +5824,8 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.Status">Status（trinity.explorer.workflow_runner 中的类）</a>
 </li>
+      <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.RunnerExecutionResult.status">status（trinity.explorer.workflow_runner.RunnerExecutionResult 属性）</a>
+</li>
       <li><a href="build_api/trinity.common.workflows.step_wise_workflow.html#trinity.common.workflows.step_wise_workflow.RewardPropagationWorkflow.step">step() （trinity.common.workflows.step_wise_workflow.RewardPropagationWorkflow 方法）</a>
 </li>
       <li><a href="build_api/trinity.common.workflows.step_wise_workflow.html#trinity.common.workflows.step_wise_workflow.StepWiseRewardWorkflow.step">step() （trinity.common.workflows.step_wise_workflow.StepWiseRewardWorkflow 方法）</a>
@@ -6020,8 +6070,6 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.to_hf_datasets">to_hf_datasets()（在 trinity.common.experience 模块中）</a>
 </li>
-      <li><a href="build_api/trinity.common.rewards.utils.html#trinity.common.rewards.utils.to_rm_gallery_messages">to_rm_gallery_messages()（在 trinity.common.rewards.utils 模块中）</a>
-</li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.ExperienceBufferConfig.to_storage_config">to_storage_config() （trinity.common.config.ExperienceBufferConfig 方法）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.TasksetConfig.to_storage_config">to_storage_config() （trinity.common.config.TasksetConfig 方法）</a>
@@ -6032,7 +6080,11 @@ window.runMermaid = runMermaid;</script>
 </li>
       <li><a href="build_api/trinity.common.workflows.workflow.html#trinity.common.workflows.workflow.Task.to_workflow">to_workflow() （trinity.common.workflows.workflow.Task 方法）</a>
 </li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenViewItem.token_id">token_id（trinity.common.experience_visualizer.ExperienceTokenViewItem 属性）</a>
+</li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience.token_level_reward">token_level_reward（trinity.common.experience.Experience 属性）</a>
+</li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenViewItem.token_text">token_text（trinity.common.experience_visualizer.ExperienceTokenViewItem 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.models.utils.html#trinity.common.models.utils.tokenize_and_mask_messages_default">tokenize_and_mask_messages_default()（在 trinity.common.models.utils 模块中）</a>
 </li>
@@ -6047,6 +6099,8 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.trainer.verl.verl_config.html#trinity.trainer.verl.verl_config.CriticModel.tokenizer_path">tokenizer_path（trinity.trainer.verl.verl_config.CriticModel 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.experience.html#trinity.common.experience.Experience.tokens">tokens（trinity.common.experience.Experience 属性）</a>
+</li>
+      <li><a href="build_api/trinity.common.experience_visualizer.html#trinity.common.experience_visualizer.ExperienceTokenView.tokens">tokens（trinity.common.experience_visualizer.ExperienceTokenView 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.InferenceModelConfig.tool_call_parser">tool_call_parser（trinity.common.config.InferenceModelConfig 属性）</a>
 </li>
@@ -6087,6 +6141,10 @@ window.runMermaid = runMermaid;</script>
       <li><a href="build_api/trinity.buffer.viewer.html#trinity.buffer.viewer.SQLExperienceViewer.total_experiences">total_experiences() （trinity.buffer.viewer.SQLExperienceViewer 方法）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.ClusterConfig.total_gpu_num">total_gpu_num（trinity.common.config.ClusterConfig 属性）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.scheduler.html#trinity.explorer.scheduler.TaskWrapper.total_runs">total_runs（trinity.explorer.scheduler.TaskWrapper 属性）</a>
+</li>
+      <li><a href="build_api/trinity.explorer.workflow_runner.html#trinity.explorer.workflow_runner.Status.total_runs">total_runs（trinity.explorer.workflow_runner.Status 属性）</a>
 </li>
       <li><a href="build_api/trinity.common.config.html#trinity.common.config.BufferConfig.total_steps">total_steps（trinity.common.config.BufferConfig 属性）</a>
 </li>
@@ -6557,6 +6615,8 @@ window.runMermaid = runMermaid;</script>
         <li><a href="build_api/trinity.buffer.operators.filters.reward_filter.html#module-trinity.buffer.operators.filters.reward_filter">module</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     trinity.buffer.operators.mappers
 
@@ -6564,8 +6624,6 @@ window.runMermaid = runMermaid;</script>
         <li><a href="build_api/trinity.buffer.operators.mappers.html#module-trinity.buffer.operators.mappers">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     trinity.buffer.operators.mappers.pass_rate_calculator
 
@@ -6784,6 +6842,13 @@ window.runMermaid = runMermaid;</script>
 </li>
       </ul></li>
       <li>
+    trinity.common.experience_visualizer
+
+      <ul>
+        <li><a href="build_api/trinity.common.experience_visualizer.html#module-trinity.common.experience_visualizer">module</a>
+</li>
+      </ul></li>
+      <li>
     trinity.common.models
 
       <ul>
@@ -6935,13 +7000,6 @@ window.runMermaid = runMermaid;</script>
 
       <ul>
         <li><a href="build_api/trinity.common.rewards.tool_reward.html#module-trinity.common.rewards.tool_reward">module</a>
-</li>
-      </ul></li>
-      <li>
-    trinity.common.rewards.utils
-
-      <ul>
-        <li><a href="build_api/trinity.common.rewards.utils.html#module-trinity.common.rewards.utils">module</a>
 </li>
       </ul></li>
       <li>
