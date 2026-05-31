@@ -1023,8 +1023,6 @@ window.runMermaid = runMermaid;</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">ABC</span><span class="p">,</span> <span class="n">abstractmethod</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">transformers</span>
-
 <span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">FormatConfig</span><span class="p">,</span> <span class="n">StorageConfig</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.constants</span><span class="w"> </span><span class="kn">import</span> <span class="n">PromptType</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.experience</span><span class="w"> </span><span class="kn">import</span> <span class="n">Experience</span>
@@ -1134,6 +1132,8 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="SFTFormatter.__init__">
 <a class="viewcode-back" href="../../../../build_api/trinity.buffer.schema.formatter.html#trinity.buffer.schema.formatter.SFTFormatter.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">format_config</span><span class="p">:</span> <span class="n">FormatConfig</span><span class="p">):</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.models.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">processor_or_tokenizer_cls</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">get_logger</span><span class="p">(</span><span class="s2">&quot;sft_dataset_formatter&quot;</span><span class="p">,</span> <span class="n">in_ray_actor</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prompt_type</span> <span class="o">=</span> <span class="n">format_config</span><span class="o">.</span><span class="n">prompt_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">enable_concatenated_multi_turn</span> <span class="o">=</span> <span class="n">format_config</span><span class="o">.</span><span class="n">enable_concatenated_multi_turn</span>
@@ -1141,12 +1141,8 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="o">=</span> <span class="n">format_config</span><span class="o">.</span><span class="n">image_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="o">=</span> <span class="n">format_config</span><span class="o">.</span><span class="n">video_key</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">enable_thinking</span> <span class="o">=</span> <span class="n">format_config</span><span class="o">.</span><span class="n">enable_thinking</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">processor</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoProcessor</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">tokenizer_path</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">tokenizer</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">processor</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">tokenizer_path</span><span class="p">)</span>
+        <span class="n">tokenizer_cls</span> <span class="o">=</span> <span class="n">processor_or_tokenizer_cls</span><span class="p">(</span><span class="n">tokenizer_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processor_or_tokenizer</span> <span class="o">=</span> <span class="n">tokenizer_cls</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">tokenizer_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chat_template</span> <span class="o">=</span> <span class="n">format_config</span><span class="o">.</span><span class="n">chat_template</span>
         <span class="c1"># For messages type</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_type</span> <span class="o">==</span> <span class="n">PromptType</span><span class="o">.</span><span class="n">MESSAGES</span><span class="p">:</span>
@@ -1174,7 +1170,6 @@ window.runMermaid = runMermaid;</script>
 <span class="sd">        Args:</span>
 <span class="sd">            messages (List[Dict]): The list of message dictionaries.</span>
 <span class="sd">            tools (Optional[List[Dict]|str], optional): The list of tool dictionaries or a JSON string. Defaults to None.</span>
-<span class="sd">            mm_data (Optional[Dict], optional): Multi-modal data such as images or videos. Defaults to None.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Experience: The resulting Experience object.</span>
@@ -1196,77 +1191,51 @@ window.runMermaid = runMermaid;</script>
                 <span class="p">)</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Invalid JSON format for tools&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_concatenated_multi_turn</span><span class="p">:</span>
-            <span class="n">token_ids</span><span class="p">,</span> <span class="n">action_mask</span><span class="p">,</span> <span class="n">prompt_length</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_mask_method</span><span class="p">(</span>
-                <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">processor</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_mask_method</span><span class="p">(</span>
+                <span class="n">tokenizer</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">processor_or_tokenizer</span><span class="p">,</span>
                 <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
                 <span class="n">tools</span><span class="o">=</span><span class="n">tools</span><span class="p">,</span>
                 <span class="n">chat_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chat_template</span><span class="p">,</span>
                 <span class="n">enable_thinking</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">enable_thinking</span><span class="p">,</span>
             <span class="p">)</span>
+            <span class="n">token_ids</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;input_ids&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">action_mask</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;assistant_masks&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">prompt_length</span> <span class="o">=</span> <span class="n">action_mask</span><span class="o">.</span><span class="n">argmax</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">Experience</span><span class="p">(</span>
                 <span class="n">tokens</span><span class="o">=</span><span class="n">token_ids</span><span class="p">,</span>
                 <span class="n">action_mask</span><span class="o">=</span><span class="n">action_mask</span><span class="p">[</span><span class="n">prompt_length</span><span class="p">:],</span>
                 <span class="n">prompt_length</span><span class="o">=</span><span class="n">prompt_length</span><span class="p">,</span>
                 <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">image_key</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">video_key</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.models.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
-                <span class="n">build_mm_input_for_training</span><span class="p">,</span>
-                <span class="n">build_multi_modal_data</span><span class="p">,</span>
-            <span class="p">)</span>
-
-            <span class="n">full_text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
-                <span class="n">messages</span><span class="p">,</span>
-                <span class="n">tokenize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">chat_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chat_template</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">prompt</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
-                <span class="n">messages</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
-                <span class="n">tokenize</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">chat_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chat_template</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">multi_modal_data</span> <span class="o">=</span> <span class="n">build_multi_modal_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="p">,</span> <span class="n">messages</span><span class="p">)</span>
-            <span class="n">full_text_inputs</span> <span class="o">=</span> <span class="n">build_mm_input_for_training</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="p">,</span>
-                <span class="n">full_text</span><span class="p">,</span>
-                <span class="n">multi_modal_data</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">tokens</span> <span class="o">=</span> <span class="n">full_text_inputs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;input_ids&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">full_text_inputs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-            <span class="n">prompt_text_inputs</span> <span class="o">=</span> <span class="n">build_mm_input_for_training</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">processor</span><span class="p">,</span>
-                <span class="n">prompt</span><span class="p">,</span>
-                <span class="n">multi_modal_data</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="k">return</span> <span class="n">Experience</span><span class="p">(</span>
-                <span class="n">tokens</span><span class="o">=</span><span class="n">tokens</span><span class="p">,</span>
-                <span class="n">prompt_length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">prompt_text_inputs</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]),</span>
-                <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
-                <span class="n">multi_modal_inputs</span><span class="o">=</span><span class="n">full_text_inputs</span><span class="p">,</span>
+                <span class="n">multi_modal_inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">token_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
+            <span class="n">common_kwargs</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span>
+                <span class="n">chat_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chat_template</span><span class="p">,</span>
+                <span class="n">tools</span><span class="o">=</span><span class="n">tools</span><span class="p">,</span>
+                <span class="n">tokenize</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span>
+                <span class="n">enable_thinking</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">enable_thinking</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor_or_tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
                 <span class="n">messages</span><span class="p">,</span>
-                <span class="n">tools</span><span class="o">=</span><span class="n">tools</span><span class="p">,</span>
                 <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-                <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span>
-                <span class="n">chat_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chat_template</span><span class="p">,</span>
-                <span class="n">return_dict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-            <span class="n">prompt_tokens_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
+                <span class="n">return_dict</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">common_kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">prompt_tokens_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor_or_tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
                 <span class="n">messages</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
-                <span class="n">tools</span><span class="o">=</span><span class="n">tools</span><span class="p">,</span>
                 <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span>
-                <span class="n">chat_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chat_template</span><span class="p">,</span>
                 <span class="n">return_dict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">common_kwargs</span><span class="p">,</span>
             <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">token_ids</span> <span class="o">=</span> <span class="n">inputs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;input_ids&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">inputs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># remove attention mask if exists</span>
+            <span class="n">inputs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;assistant_masks&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>  <span class="c1"># remove assistant_masks if exists</span>
             <span class="k">return</span> <span class="n">Experience</span><span class="p">(</span>
                 <span class="n">tokens</span><span class="o">=</span><span class="n">token_ids</span><span class="p">,</span>
                 <span class="n">prompt_length</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">prompt_tokens_ids</span><span class="p">),</span>
                 <span class="n">messages</span><span class="o">=</span><span class="n">messages</span><span class="p">,</span>
+                <span class="n">multi_modal_inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
             <span class="p">)</span>
 
 <div class="viewcode-block" id="SFTFormatter.format">
@@ -1342,7 +1311,10 @@ window.runMermaid = runMermaid;</script>
 <div class="viewcode-block" id="DPOFormatter.__init__">
 <a class="viewcode-back" href="../../../../build_api/trinity.buffer.schema.formatter.html#trinity.buffer.schema.formatter.DPOFormatter.__init__">[文档]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">format_config</span><span class="p">:</span> <span class="n">FormatConfig</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">transformers</span><span class="o">.</span><span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">tokenizer_path</span><span class="p">)</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.models.mm_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">processor_or_tokenizer_cls</span>
+
+        <span class="n">tokenizer_cls</span> <span class="o">=</span> <span class="n">processor_or_tokenizer_cls</span><span class="p">(</span><span class="n">tokenizer_path</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processor_or_tokenizer</span> <span class="o">=</span> <span class="n">tokenizer_cls</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">tokenizer_path</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">prompt_type</span> <span class="o">=</span> <span class="n">format_config</span><span class="o">.</span><span class="n">prompt_type</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">chat_template</span> <span class="o">=</span> <span class="n">format_config</span><span class="o">.</span><span class="n">chat_template</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">prompt_type</span> <span class="o">==</span> <span class="n">PromptType</span><span class="o">.</span><span class="n">PLAINTEXT</span><span class="p">:</span>
@@ -1363,21 +1335,21 @@ window.runMermaid = runMermaid;</script>
     <span class="k">def</span><span class="w"> </span><span class="nf">_messages_to_experience</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">prompt_messages</span><span class="p">,</span> <span class="n">chosen_messages</span><span class="p">,</span> <span class="n">rejected_messages</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Experience</span><span class="p">:</span>
-        <span class="n">prompt_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
+        <span class="n">prompt_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor_or_tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
             <span class="n">prompt_messages</span><span class="p">,</span>
             <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span>
             <span class="n">chat_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chat_template</span><span class="p">,</span>
             <span class="n">return_dict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">chosen_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
+        <span class="n">chosen_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor_or_tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
             <span class="n">prompt_messages</span> <span class="o">+</span> <span class="n">chosen_messages</span><span class="p">,</span>
             <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span>
             <span class="n">chat_template</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">chat_template</span><span class="p">,</span>
             <span class="n">return_dict</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="nb">len</span><span class="p">(</span><span class="n">prompt_tokens</span><span class="p">)</span> <span class="p">:]</span>
-        <span class="n">rejected_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
+        <span class="n">rejected_tokens</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">processor_or_tokenizer</span><span class="o">.</span><span class="n">apply_chat_template</span><span class="p">(</span>
             <span class="n">prompt_messages</span> <span class="o">+</span> <span class="n">rejected_messages</span><span class="p">,</span>
             <span class="n">add_generation_prompt</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
             <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span>

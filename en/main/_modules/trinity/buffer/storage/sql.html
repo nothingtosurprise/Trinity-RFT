@@ -1064,20 +1064,28 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Init engine </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2"> with table </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> with schema </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">schema_type</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span> <span class="o">=</span> <span class="n">init_engine</span><span class="p">(</span>
-            <span class="n">db_url</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>
-            <span class="n">table_name</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">schema_type</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">schema_type</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_tables</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Init SQL storage at </span><span class="si">{</span><span class="n">config</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_retry_times</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">max_retry_times</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_retry_interval</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">max_retry_interval</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ref_count</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="c1"># Assume that the auto-increment ID starts counting from 1, so the default offset should be 0.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">offset</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">index</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_init_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StorageConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize engine and table classes. Subclasses may override.&quot;&quot;&quot;</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">init_engine</span><span class="p">(</span>
+            <span class="n">db_url</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">path</span><span class="p">,</span>  <span class="c1"># type: ignore</span>
+            <span class="n">table_name</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">schema_type</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">schema_type</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">schema_type</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">config</span><span class="o">.</span><span class="n">schema_type</span> <span class="o">==</span> <span class="s2">&quot;task&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span> <span class="o">=</span> <span class="n">result</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">blob_model_cls</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">blob_model_cls</span> <span class="o">=</span> <span class="n">result</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">session</span> <span class="o">=</span> <span class="n">sessionmaker</span><span class="p">(</span><span class="n">bind</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">engine</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SQLStorage.get_wrapper">
 <a class="viewcode-back" href="../../../../build_api/trinity.buffer.storage.sql.html#trinity.buffer.storage.sql.SQLStorage.get_wrapper">[docs]</a>
@@ -1149,12 +1157,9 @@ window.runMermaid = runMermaid;</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">max_experience_bytes</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span>
             <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">MAX_EXP_BYTES_ENV_VAR</span><span class="p">,</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">32</span><span class="p">)</span>  <span class="c1"># default 32MB</span>
         <span class="p">)</span>
-        <span class="c1"># TODO: optimize the following logic</span>
         <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">schema_type</span> <span class="o">==</span> <span class="s2">&quot;experience&quot;</span><span class="p">:</span>
-            <span class="c1"># NOTE: consistent with the old version of experience buffer</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_read_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_priority</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># SFT / DPO uses FIFO style</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_read_method</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_fifo</span></div>
 
 
@@ -1162,23 +1167,23 @@ window.runMermaid = runMermaid;</script>
 <a class="viewcode-back" href="../../../../build_api/trinity.buffer.storage.sql.html#trinity.buffer.storage.sql.SQLExperienceStorage.write">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Experience</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">def</span><span class="w"> </span><span class="nf">operation</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
-            <span class="n">experience_models</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
-                <span class="n">exp_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">from_experience</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
-                <span class="c1"># TODO: this is a temporary solution to avoid OOM when loading large experience into memory,</span>
-                <span class="c1"># we need a better way to handle this in the future</span>
+                <span class="n">exp_bytes</span> <span class="o">=</span> <span class="n">exp</span><span class="o">.</span><span class="n">serialize</span><span class="p">()</span>
                 <span class="k">if</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">max_experience_bytes</span> <span class="o">&gt;</span> <span class="mi">0</span>
-                    <span class="ow">and</span> <span class="n">exp_model</span><span class="o">.</span><span class="n">experience_bytes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-                    <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">exp_model</span><span class="o">.</span><span class="n">experience_bytes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_experience_bytes</span>
+                    <span class="ow">and</span> <span class="n">exp_bytes</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">exp_bytes</span><span class="p">)</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_experience_bytes</span>
                 <span class="p">):</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Experience </span><span class="si">{</span><span class="n">exp_model</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> size </span><span class="si">{</span><span class="n">exp_model</span><span class="o">.</span><span class="n">experience_bytes</span><span class="si">}</span><span class="s2"> bytes exceeds the &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;max_experience_bytes </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_experience_bytes</span><span class="si">}</span><span class="s2"> bytes, it may cause OOM when loading into memory.&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Experience size </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">exp_bytes</span><span class="p">)</span><span class="si">}</span><span class="s2"> bytes exceeds the &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;max_experience_bytes </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max_experience_bytes</span><span class="si">}</span><span class="s2"> bytes, skipping.&quot;</span>
                     <span class="p">)</span>
                     <span class="k">continue</span>
-                <span class="n">experience_models</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">exp_model</span><span class="p">)</span>
-            <span class="n">session</span><span class="o">.</span><span class="n">add_all</span><span class="p">(</span><span class="n">experience_models</span><span class="p">)</span>
+                <span class="n">meta_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">from_experience</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">meta_row</span><span class="p">)</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span>
+                <span class="n">blob_row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">blob_model_cls</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">meta_row</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">experience_bytes</span><span class="o">=</span><span class="n">exp_bytes</span><span class="p">)</span>
+                <span class="n">session</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">blob_row</span><span class="p">)</span>
 
         <span class="n">run_with_retry_session</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span>
@@ -1188,6 +1193,22 @@ window.runMermaid = runMermaid;</script>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Write </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="p">)</span><span class="si">}</span><span class="s2"> experiences to SQL storage.&quot;</span><span class="p">)</span></div>
 
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_fetch_blobs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session</span><span class="p">,</span> <span class="n">ids</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Batch fetch blob bytes by meta ids.&quot;&quot;&quot;</span>
+        <span class="n">blobs</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blob_model_cls</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">blob_model_cls</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">b</span><span class="o">.</span><span class="n">id</span><span class="p">:</span> <span class="n">b</span><span class="o">.</span><span class="n">experience_bytes</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">blobs</span><span class="p">}</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_assemble_experiences</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">meta_rows</span><span class="p">,</span> <span class="n">blob_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Experience</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Combine meta rows with blob bytes into Experience objects.&quot;&quot;&quot;</span>
+        <span class="n">experiences</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">meta_rows</span><span class="p">:</span>
+            <span class="n">blob_bytes</span> <span class="o">=</span> <span class="n">blob_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">blob_bytes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Missing blob for experience id=</span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">, skipping.&quot;</span><span class="p">)</span>
+                <span class="k">continue</span>
+            <span class="n">experiences</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">to_experience</span><span class="p">(</span><span class="n">blob_bytes</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">experiences</span>
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_read_fifo</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Experience</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Read experiences in FIFO order.&quot;&quot;&quot;</span>
@@ -1203,18 +1224,20 @@ window.runMermaid = runMermaid;</script>
                 <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
 
             <span class="k">def</span><span class="w"> </span><span class="nf">operation</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
-                <span class="n">experiences</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">meta_rows</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="p">)</span>
                     <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">id</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">offset</span><span class="p">)</span>
                     <span class="o">.</span><span class="n">order_by</span><span class="p">(</span><span class="n">asc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
                     <span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">batch_size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">exp_list</span><span class="p">))</span>
                     <span class="o">.</span><span class="n">all</span><span class="p">()</span>
                 <span class="p">)</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="n">experiences</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">meta_rows</span><span class="p">:</span>
                     <span class="k">return</span> <span class="p">[],</span> <span class="kc">None</span>
+                <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">meta_rows</span><span class="p">]</span>
+                <span class="n">blob_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_blobs</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">(</span>
-                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">to_experience</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span> <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">experiences</span><span class="p">],</span>
-                    <span class="n">experiences</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_experiences</span><span class="p">(</span><span class="n">meta_rows</span><span class="p">,</span> <span class="n">blob_map</span><span class="p">),</span>
+                    <span class="n">meta_rows</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
                 <span class="p">)</span>
 
             <span class="n">experiences</span><span class="p">,</span> <span class="n">next_offset</span> <span class="o">=</span> <span class="n">run_with_retry_session</span><span class="p">(</span>
@@ -1251,7 +1274,7 @@ window.runMermaid = runMermaid;</script>
                     <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">model_version</span> <span class="o">&gt;=</span> <span class="n">min_model_version</span><span class="p">)</span>
                 <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">enable_replay</span><span class="p">:</span>
                     <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">consumed</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
-                <span class="n">experiences</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">meta_rows</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">query</span><span class="o">.</span><span class="n">order_by</span><span class="p">(</span>
                         <span class="n">asc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">consumed</span><span class="p">),</span> <span class="n">desc</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
                     <span class="p">)</span>
@@ -1259,18 +1282,19 @@ window.runMermaid = runMermaid;</script>
                     <span class="o">.</span><span class="n">with_for_update</span><span class="p">()</span>
                     <span class="o">.</span><span class="n">all</span><span class="p">()</span>
                 <span class="p">)</span>
-                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">experiences</span><span class="p">)</span> <span class="o">!=</span> <span class="n">batch_size</span><span class="p">:</span>
-                    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">experiences</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta_rows</span><span class="p">)</span> <span class="o">!=</span> <span class="n">batch_size</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">meta_rows</span><span class="p">),</span> <span class="kc">False</span><span class="p">,</span> <span class="p">[]</span>
 
-                <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">exp</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">experiences</span><span class="p">]</span>
+                <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">meta_rows</span><span class="p">]</span>
                 <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="p">)</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">id</span><span class="o">.</span><span class="n">in_</span><span class="p">(</span><span class="n">ids</span><span class="p">))</span><span class="o">.</span><span class="n">update</span><span class="p">(</span>
                     <span class="p">{</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">consumed</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">consumed</span> <span class="o">+</span> <span class="mi">1</span><span class="p">},</span>
                     <span class="n">synchronize_session</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">)</span>
+                <span class="n">blob_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_blobs</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span>
                 <span class="k">return</span> <span class="p">(</span>
-                    <span class="nb">len</span><span class="p">(</span><span class="n">experiences</span><span class="p">),</span>
+                    <span class="nb">len</span><span class="p">(</span><span class="n">meta_rows</span><span class="p">),</span>
                     <span class="kc">True</span><span class="p">,</span>
-                    <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">to_experience</span><span class="p">(</span><span class="n">exp</span><span class="p">)</span> <span class="k">for</span> <span class="n">exp</span> <span class="ow">in</span> <span class="n">experiences</span><span class="p">],</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_experiences</span><span class="p">(</span><span class="n">meta_rows</span><span class="p">,</span> <span class="n">blob_map</span><span class="p">),</span>
                 <span class="p">)</span>
 
             <span class="n">latest_batch_size</span><span class="p">,</span> <span class="n">has_full_batch</span><span class="p">,</span> <span class="n">experiences</span> <span class="o">=</span> <span class="n">run_with_retry_session</span><span class="p">(</span>
@@ -1290,6 +1314,66 @@ window.runMermaid = runMermaid;</script>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Waiting for </span><span class="si">{</span><span class="n">batch_size</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">exp_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> more experiences...&quot;</span><span class="p">)</span>
             <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">exp_list</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_build_filter_conditions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Build SQLAlchemy filter conditions from a filter dict.&quot;&quot;&quot;</span>
+        <span class="n">conditions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filters</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">conditions</span>
+        <span class="k">if</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reward_min&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">reward</span> <span class="o">&gt;=</span> <span class="n">filters</span><span class="p">[</span><span class="s2">&quot;reward_min&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reward_max&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">reward</span> <span class="o">&lt;=</span> <span class="n">filters</span><span class="p">[</span><span class="s2">&quot;reward_max&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_version_min&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">model_version</span> <span class="o">&gt;=</span> <span class="n">filters</span><span class="p">[</span><span class="s2">&quot;model_version_min&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;model_version_max&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">model_version</span> <span class="o">&lt;=</span> <span class="n">filters</span><span class="p">[</span><span class="s2">&quot;model_version_max&quot;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">filters</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;task_id&quot;</span><span class="p">):</span>
+            <span class="n">conditions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="o">.</span><span class="n">task_id</span> <span class="o">==</span> <span class="n">filters</span><span class="p">[</span><span class="s2">&quot;task_id&quot;</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">conditions</span>
+
+<div class="viewcode-block" id="SQLExperienceStorage.count">
+<a class="viewcode-back" href="../../../../build_api/trinity.buffer.storage.sql.html#trinity.buffer.storage.sql.SQLExperienceStorage.count">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Count experiences matching the given filters.&quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">and_</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">operation</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+            <span class="n">query</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="p">)</span>
+            <span class="n">conditions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_filter_conditions</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">conditions</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="n">query</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">and_</span><span class="p">(</span><span class="o">*</span><span class="n">conditions</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">query</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+
+        <span class="k">return</span> <span class="n">run_with_retry_session</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retry_times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retry_interval</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="SQLExperienceStorage.query">
+<a class="viewcode-back" href="../../../../build_api/trinity.buffer.storage.sql.html#trinity.buffer.storage.sql.SQLExperienceStorage.query">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">query</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span> <span class="n">filters</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Experience</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Query experiences with pagination and filters.&quot;&quot;&quot;</span>
+        <span class="kn">from</span><span class="w"> </span><span class="nn">sqlalchemy</span><span class="w"> </span><span class="kn">import</span> <span class="n">and_</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">operation</span><span class="p">(</span><span class="n">session</span><span class="p">):</span>
+            <span class="n">q</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_model_cls</span><span class="p">)</span>
+            <span class="n">conditions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_filter_conditions</span><span class="p">(</span><span class="n">filters</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">conditions</span><span class="p">:</span>
+                <span class="n">q</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">and_</span><span class="p">(</span><span class="o">*</span><span class="n">conditions</span><span class="p">))</span>
+            <span class="n">meta_rows</span> <span class="o">=</span> <span class="n">q</span><span class="o">.</span><span class="n">offset</span><span class="p">(</span><span class="n">offset</span><span class="p">)</span><span class="o">.</span><span class="n">limit</span><span class="p">(</span><span class="n">limit</span><span class="p">)</span><span class="o">.</span><span class="n">all</span><span class="p">()</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">meta_rows</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">[]</span>
+            <span class="n">ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">id</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">meta_rows</span><span class="p">]</span>
+            <span class="n">blob_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_fetch_blobs</span><span class="p">(</span><span class="n">session</span><span class="p">,</span> <span class="n">ids</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_assemble_experiences</span><span class="p">(</span><span class="n">meta_rows</span><span class="p">,</span> <span class="n">blob_map</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">run_with_retry_session</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">session</span><span class="p">,</span> <span class="n">operation</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retry_times</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_retry_interval</span>
+        <span class="p">)</span></div>
+
 
 <div class="viewcode-block" id="SQLExperienceStorage.read">
 <a class="viewcode-back" href="../../../../build_api/trinity.buffer.storage.sql.html#trinity.buffer.storage.sql.SQLExperienceStorage.read">[docs]</a>
