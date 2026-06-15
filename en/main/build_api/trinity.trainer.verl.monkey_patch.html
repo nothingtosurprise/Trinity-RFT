@@ -47,8 +47,8 @@
     <link rel="icon" href="../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="trinity.trainer.verl.utils module" href="trinity.trainer.verl.utils.html" />
-    <link rel="prev" title="trinity.trainer.verl.megatron_workers module" href="trinity.trainer.verl.megatron_workers.html" />
+    <link rel="next" title="trinity.trainer.verl.trainer module" href="trinity.trainer.verl.trainer.html" />
+    <link rel="prev" title="trinity.trainer.verl.megatron_engine module" href="trinity.trainer.verl.megatron_engine.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="0.5.2" />
@@ -272,16 +272,28 @@
 </ul>
 </details></li>
 <li class="toctree-l3 current active has-children"><a class="reference internal" href="trinity.trainer.verl.html">trinity.trainer.verl package</a><details open="open"><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul class="current">
-<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.dp_actor.html">trinity.trainer.verl.dp_actor module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.fsdp_checkpoint_manager.html">trinity.trainer.verl.fsdp_checkpoint_manager module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.fsdp_workers.html">trinity.trainer.verl.fsdp_workers module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.megatron_actor.html">trinity.trainer.verl.megatron_actor module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.megatron_checkpoint_manager.html">trinity.trainer.verl.megatron_checkpoint_manager module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.megatron_workers.html">trinity.trainer.verl.megatron_workers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.checkpoint.html">trinity.trainer.verl.checkpoint module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.config.html">trinity.trainer.verl.config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.fsdp_engine.html">trinity.trainer.verl.fsdp_engine module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.losses.html">trinity.trainer.verl.losses module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.megatron_engine.html">trinity.trainer.verl.megatron_engine module</a></li>
 <li class="toctree-l4 current active"><a class="current reference internal" href="#">trinity.trainer.verl.monkey_patch module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.trainer.html">trinity.trainer.verl.trainer module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.utils.html">trinity.trainer.verl.utils module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.verl_config.html">trinity.trainer.verl.verl_config module</a></li>
-<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.verl_trainer.html">trinity.trainer.verl.verl_trainer module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl.workers.html">trinity.trainer.verl.workers module</a></li>
+</ul>
+</details></li>
+<li class="toctree-l3 has-children"><a class="reference internal" href="trinity.trainer.verl_legacy.html">trinity.trainer.verl_legacy package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl_legacy.dp_actor.html">trinity.trainer.verl_legacy.dp_actor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl_legacy.fsdp_checkpoint_manager.html">trinity.trainer.verl_legacy.fsdp_checkpoint_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl_legacy.fsdp_workers.html">trinity.trainer.verl_legacy.fsdp_workers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl_legacy.megatron_actor.html">trinity.trainer.verl_legacy.megatron_actor module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl_legacy.megatron_checkpoint_manager.html">trinity.trainer.verl_legacy.megatron_checkpoint_manager module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl_legacy.megatron_workers.html">trinity.trainer.verl_legacy.megatron_workers module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl_legacy.monkey_patch.html">trinity.trainer.verl_legacy.monkey_patch module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl_legacy.utils.html">trinity.trainer.verl_legacy.utils module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl_legacy.verl_config.html">trinity.trainer.verl_legacy.verl_config module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="trinity.trainer.verl_legacy.verl_trainer.html">trinity.trainer.verl_legacy.verl_trainer module</a></li>
 </ul>
 </details></li>
 <li class="toctree-l3"><a class="reference internal" href="trinity.trainer.trainer.html">trinity.trainer.trainer module</a></li>
@@ -630,9 +642,8 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trinity.trainer.verl.monkey_patch.patch_fused_kernels"><code class="docutils literal notranslate"><span class="pre">patch_fused_kernels()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trinity.trainer.verl.monkey_patch.patch_forward_with_backends"><code class="docutils literal notranslate"><span class="pre">patch_forward_with_backends()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trinity.trainer.verl.monkey_patch.apply_monkey_patch"><code class="docutils literal notranslate"><span class="pre">apply_monkey_patch()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trinity.trainer.verl.monkey_patch.save_checkpoint"><code class="docutils literal notranslate"><span class="pre">save_checkpoint()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trinity.trainer.verl.monkey_patch.patch_verl_engine"><code class="docutils literal notranslate"><span class="pre">patch_verl_engine()</span></code></a></li>
 </ul>
             </nav>
         </div>
@@ -647,47 +658,15 @@
   <section id="module-trinity.trainer.verl.monkey_patch">
 <span id="trinity-trainer-verl-monkey-patch-module"></span><h1>trinity.trainer.verl.monkey_patch module<a class="headerlink" href="#module-trinity.trainer.verl.monkey_patch" title="Link to this heading">#</a></h1>
 <dl class="py function">
-<dt class="sig sig-object py" id="trinity.trainer.verl.monkey_patch.patch_fused_kernels">
-<span class="sig-prename descclassname"><span class="pre">trinity.trainer.verl.monkey_patch.</span></span><span class="sig-name descname"><span class="pre">patch_fused_kernels</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fused_kernels_backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trinity/trainer/verl/monkey_patch.html#patch_fused_kernels"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trinity.trainer.verl.monkey_patch.patch_fused_kernels" title="Link to this definition">#</a></dt>
-<dd><p>Fix VLM sequence parallelism bug with optimized backend in veRL.</p>
+<dt class="sig sig-object py" id="trinity.trainer.verl.monkey_patch.save_checkpoint">
+<span class="sig-prename descclassname"><span class="pre">trinity.trainer.verl.monkey_patch.</span></span><span class="sig-name descname"><span class="pre">save_checkpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">self</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">local_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hdfs_path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">global_step</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_ckpt_to_keep</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/trinity/trainer/verl/monkey_patch.html#save_checkpoint"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trinity.trainer.verl.monkey_patch.save_checkpoint" title="Link to this definition">#</a></dt>
+<dd><p>Save FSDP checkpoint, handling parameter offload as needed.</p>
 </dd></dl>
 
 <dl class="py function">
-<dt class="sig sig-object py" id="trinity.trainer.verl.monkey_patch.patch_forward_with_backends">
-<span class="sig-prename descclassname"><span class="pre">trinity.trainer.verl.monkey_patch.</span></span><span class="sig-name descname"><span class="pre">patch_forward_with_backends</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PreTrainedModel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fused_kernels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fused_kernels_backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">None</span></span></span><a class="reference internal" href="../_modules/trinity/trainer/verl/monkey_patch.html#patch_forward_with_backends"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trinity.trainer.verl.monkey_patch.patch_forward_with_backends" title="Link to this definition">#</a></dt>
-<dd><p>Monkey-patch the model’s forward method with optimized backend implementations.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> – The model to patch.</p></li>
-<li><p><strong>use_fused_kernels</strong> – Whether to enable fused kernels.</p></li>
-<li><p><strong>fused_kernels_backend</strong> – The backend to use (‘triton’ or ‘torch’).</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="trinity.trainer.verl.monkey_patch.apply_monkey_patch">
-<span class="sig-prename descclassname"><span class="pre">trinity.trainer.verl.monkey_patch.</span></span><span class="sig-name descname"><span class="pre">apply_monkey_patch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">PreTrainedModel</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ulysses_sp_size</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_remove_padding</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_fused_kernels</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fused_kernels_backend</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_prefix_grouper</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tiled_mlp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tiled_mlp_shards</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trinity/trainer/verl/monkey_patch.html#apply_monkey_patch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trinity.trainer.verl.monkey_patch.apply_monkey_patch" title="Link to this definition">#</a></dt>
-<dd><p>Apply monkey patch to the models for ulysses sequence parallel, fused kernel, prefix grouper,
-and tiled MLP.</p>
-<p>In the end of this function forward function of the model is patched for fused kernel.
-If the model is not supported with fused kernel, please return after patch.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>model</strong> – The model to apply the monkey patch.</p></li>
-<li><p><strong>ulysses_sp_size</strong> – The size of ulysses sequence parallel.</p></li>
-<li><p><strong>use_remove_padding</strong> – Whether to use remove padding.</p></li>
-<li><p><strong>use_fused_kernels</strong> – Whether to use fused kernels.</p></li>
-<li><p><strong>fused_kernels_backend</strong> – The backend to use for fused kernels.</p></li>
-<li><p><strong>use_tiled_mlp</strong> – Whether to use TiledMLP for memory-efficient MLP computation.</p></li>
-<li><p><strong>tiled_mlp_shards</strong> – Number of shards for TiledMLP (higher = lower memory, slightly slower).</p></li>
-</ul>
-</dd>
-</dl>
-</dd></dl>
+<dt class="sig sig-object py" id="trinity.trainer.verl.monkey_patch.patch_verl_engine">
+<span class="sig-prename descclassname"><span class="pre">trinity.trainer.verl.monkey_patch.</span></span><span class="sig-name descname"><span class="pre">patch_verl_engine</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">engine</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/trinity/trainer/verl/monkey_patch.html#patch_verl_engine"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#trinity.trainer.verl.monkey_patch.patch_verl_engine" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
 
 </section>
 
@@ -703,20 +682,20 @@ If the model is not supported with fused kernel, please return after patch.</p>
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="trinity.trainer.verl.megatron_workers.html"
+       href="trinity.trainer.verl.megatron_engine.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">trinity.trainer.verl.megatron_workers module</p>
+        <p class="prev-next-title">trinity.trainer.verl.megatron_engine module</p>
       </div>
     </a>
     <a class="right-next"
-       href="trinity.trainer.verl.utils.html"
+       href="trinity.trainer.verl.trainer.html"
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">trinity.trainer.verl.utils module</p>
+        <p class="prev-next-title">trinity.trainer.verl.trainer module</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -738,9 +717,8 @@ If the model is not supported with fused kernel, please return after patch.</p>
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trinity.trainer.verl.monkey_patch.patch_fused_kernels"><code class="docutils literal notranslate"><span class="pre">patch_fused_kernels()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trinity.trainer.verl.monkey_patch.patch_forward_with_backends"><code class="docutils literal notranslate"><span class="pre">patch_forward_with_backends()</span></code></a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trinity.trainer.verl.monkey_patch.apply_monkey_patch"><code class="docutils literal notranslate"><span class="pre">apply_monkey_patch()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trinity.trainer.verl.monkey_patch.save_checkpoint"><code class="docutils literal notranslate"><span class="pre">save_checkpoint()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#trinity.trainer.verl.monkey_patch.patch_verl_engine"><code class="docutils literal notranslate"><span class="pre">patch_verl_engine()</span></code></a></li>
 </ul>
   </nav></div>
 
