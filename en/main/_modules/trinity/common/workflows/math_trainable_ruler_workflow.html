@@ -7,7 +7,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>trinity.buffer.reader.file_reader &#8212; Trinity-RFT 0.6.0 documentation</title>
+    <title>trinity.common.workflows.math_trainable_ruler_workflow &#8212; Trinity-RFT 0.6.0 documentation</title>
   
   
   
@@ -400,7 +400,7 @@ mermaid.initialize(
 
 window.addEventListener("load", load);
 window.runMermaid = runMermaid;</script>
-    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/trinity/buffer/reader/file_reader';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/trinity/common/workflows/math_trainable_ruler_workflow';</script>
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="icon" href="../../../../_static/favicon.ico"/>
     <link rel="index" title="Index" href="../../../../genindex.html" />
@@ -552,7 +552,7 @@ window.runMermaid = runMermaid;</script>
             </p>
           </summary>
           <ul>
-            <li class="toctree-l2 current "><a class="reference" href="file_reader.html">latest</a></li>
+            <li class="toctree-l2 current "><a class="reference" href="math_trainable_ruler_workflow.html">latest</a></li>
           </ul>
         </details>
       </li>
@@ -671,6 +671,7 @@ window.runMermaid = runMermaid;</script>
 </details></li>
 <li class="toctree-l2 has-children"><a class="reference internal" href="../../../../build_api/trinity.trainer.html">trinity.trainer package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
 <li class="toctree-l3 has-children"><a class="reference internal" href="../../../../build_api/trinity.trainer.tinker.html">trinity.trainer.tinker package</a><details><summary><span class="toctree-toggle" role="presentation"><i class="fa-solid fa-chevron-down"></i></span></summary><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../../build_api/trinity.trainer.tinker.server_loss.html">trinity.trainer.tinker.server_loss module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../build_api/trinity.trainer.tinker.tinker_trainer.html">trinity.trainer.tinker.tinker_trainer module</a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../../build_api/trinity.trainer.tinker.utils.html">trinity.trainer.tinker.utils module</a></li>
 </ul>
@@ -1013,289 +1014,238 @@ window.runMermaid = runMermaid;</script>
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <h1>Source code for trinity.buffer.reader.file_reader</h1><div class="highlight"><pre>
-<span></span><span class="sd">"""Filed based buffer reader."""</span>
+  <h1>Source code for trinity.common.workflows.math_trainable_ruler_workflow</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">"""Math workflow with trainable RULER."""</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">ast</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">copy</span><span class="w"> </span><span class="kn">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">datasets</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">load_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.experience</span><span class="w"> </span><span class="kn">import</span> <span class="n">Experience</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.models.model</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelWrapper</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.rewards.math_reward</span><span class="w"> </span><span class="kn">import</span> <span class="n">MathRewardFn</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.workflows.workflow</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleWorkflow</span><span class="p">,</span> <span class="n">Task</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">trinity.buffer.buffer_reader</span><span class="w"> </span><span class="kn">import</span> <span class="n">BufferReader</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">trinity.buffer.schema</span><span class="w"> </span><span class="kn">import</span> <span class="n">FORMATTER</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">trinity.common.config</span><span class="w"> </span><span class="kn">import</span> <span class="n">StorageConfig</span>
-
-
-<div class="viewcode-block" id="DummyProgressBar">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.DummyProgressBar">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">DummyProgressBar</span><span class="p">:</span>
-<div class="viewcode-block" id="DummyProgressBar.__init__">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.DummyProgressBar.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+<span class="c1"># the probability that the ground truth is assumed to be available for RL</span>
+<span class="n">PROBABILITY_GROUND_TRUTH_AVAILABLE</span> <span class="o">=</span> <span class="mf">0.2</span>
 
 
-<div class="viewcode-block" id="DummyProgressBar.update">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.DummyProgressBar.update">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="k">pass</span></div>
+<div class="viewcode-block" id="MathTrainableRULERWorkflow">
+<a class="viewcode-back" href="../../../../build_api/trinity.common.workflows.math_trainable_ruler_workflow.html#trinity.common.workflows.math_trainable_ruler_workflow.MathTrainableRULERWorkflow">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">MathTrainableRULERWorkflow</span><span class="p">(</span><span class="n">SimpleWorkflow</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""A workflow for math, where the policy model itself serves as a RULER reward model.</span>
+<span class="sd">    Modified from `MathRULERWorkflow`.</span>
+<span class="sd">    RULER is adapted from https://github.com/OpenPipe/ART/blob/main/src/art/rewards/ruler.py</span>
+<span class="sd">    """</span>
 
-
-<div class="viewcode-block" id="DummyProgressBar.close">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.DummyProgressBar.close">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">pass</span></div>
-</div>
-
-
-
-<span class="k">class</span><span class="w"> </span><span class="nc">_HFBatchReader</span><span class="p">:</span>
+<div class="viewcode-block" id="MathTrainableRULERWorkflow.__init__">
+<a class="viewcode-back" href="../../../../build_api/trinity.common.workflows.math_trainable_ruler_workflow.html#trinity.common.workflows.math_trainable_ruler_workflow.MathTrainableRULERWorkflow.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
-        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">default_batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">total_epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">offset</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">drop_last</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">total_steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">enable_progress_bar</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="o">*</span><span class="p">,</span>
+        <span class="n">task</span><span class="p">:</span> <span class="n">Task</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">ModelWrapper</span><span class="p">,</span>
+        <span class="n">auxiliary_models</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ModelWrapper</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">dataset_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Dataset [</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">] is empty and cannot be read in batches."</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">current_batch_size</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">drop_last</span> <span class="o">=</span> <span class="n">drop_last</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">task</span><span class="o">=</span><span class="n">task</span><span class="p">,</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">auxiliary_models</span><span class="o">=</span><span class="n">auxiliary_models</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span> <span class="o">=</span> <span class="n">offset</span>
 
-        <span class="c1"># convert epochs/steps to sample number</span>
-        <span class="k">if</span> <span class="n">total_steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">total_samples</span> <span class="o">=</span> <span class="n">default_batch_size</span> <span class="o">*</span> <span class="n">total_steps</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">total_samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_size</span> <span class="o">*</span> <span class="n">total_epochs</span>
+<div class="viewcode-block" id="MathTrainableRULERWorkflow.reset">
+<a class="viewcode-back" href="../../../../build_api/trinity.common.workflows.math_trainable_ruler_workflow.html#trinity.common.workflows.math_trainable_ruler_workflow.MathTrainableRULERWorkflow.reset">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">task</span><span class="p">:</span> <span class="n">Task</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">reward_fn</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">task</span><span class="o">.</span><span class="n">reward_fn</span> <span class="o">=</span> <span class="n">MathRewardFn</span>
+        <span class="k">if</span> <span class="n">task</span><span class="o">.</span><span class="n">reward_fn</span> <span class="o">==</span> <span class="n">MathRewardFn</span> <span class="ow">and</span> <span class="n">task</span><span class="o">.</span><span class="n">format_args</span><span class="o">.</span><span class="n">system_prompt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">task</span><span class="o">.</span><span class="n">format_args</span><span class="o">.</span><span class="n">system_prompt</span> <span class="o">=</span> <span class="s2">"""A conversation between User and Assistant. The user asks a question, and the Assistant solves it. The assistant first thinks about the reasoning process in the mind and then provides the user with the answer. The reasoning process and answer are enclosed within &lt;think&gt; &lt;/think&gt; and &lt;answer&gt; &lt;/answer&gt; tags, respectively, i.e.,</span>
+<span class="s2">&lt;think&gt; reasoning process here &lt;/think&gt;</span>
+<span class="s2">&lt;answer&gt; answer here &lt;/answer&gt;.</span>
+<span class="s2">"""</span>
+        <span class="c1"># call the SimpleWorkflow.reset</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">task</span><span class="p">)</span></div>
 
-        <span class="k">if</span> <span class="n">enable_progress_bar</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">ray.experimental.tqdm_ray</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span>
-                <span class="n">total</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">total_samples</span><span class="p">,</span>
-                <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">"Dataset [</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">] Progressing"</span><span class="p">,</span>
+<div class="viewcode-block" id="MathTrainableRULERWorkflow.run">
+<a class="viewcode-back" href="../../../../build_api/trinity.common.workflows.math_trainable_ruler_workflow.html#trinity.common.workflows.math_trainable_ruler_workflow.MathTrainableRULERWorkflow.run">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Experience</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">"""Modified from MathRULERWorkflow.run"""</span>
+
+        <span class="c1"># Part 1: generate responses to the original task (as in usual workflows)</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">format_messages</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">"start chat"</span><span class="p">)</span>
+        <span class="n">responses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">rollout_args</span><span class="p">)</span>
+        <span class="n">gold_rewards</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gold_scores_scaled</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">response</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">responses</span><span class="p">):</span>
+            <span class="n">gold_reward_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_fn</span><span class="p">(</span>  <span class="c1"># type: ignore [misc]</span>
+                <span class="n">response</span><span class="o">=</span><span class="n">response</span><span class="o">.</span><span class="n">response_text</span><span class="p">,</span>  <span class="c1"># type: ignore [arg-type]</span>
+                <span class="n">truth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">truth</span><span class="p">,</span>
             <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">metrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">gold_reward_dict</span><span class="p">)</span>
+            <span class="n">gold_reward</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">gold_reward_dict</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"gold_reward"</span><span class="p">:</span> <span class="n">gold_reward</span><span class="p">})</span>
+
+            <span class="c1"># set task_id explicitly within workflow!</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">eid</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">task_id</span><span class="p">)</span>
+            <span class="n">response</span><span class="o">.</span><span class="n">eid</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_id_base</span>
+
+            <span class="n">gold_rewards</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gold_reward</span><span class="p">)</span>
+            <span class="n">gold_scores_scaled</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="p">(</span><span class="n">gold_reward</span> <span class="o">+</span> <span class="mf">0.1</span><span class="p">)</span> <span class="o">/</span> <span class="mf">1.2</span>
+            <span class="p">)</span>  <span class="c1"># scale from range [-0.1, 1.1] to [0, 1]</span>
+
+        <span class="c1"># Part 2: get and use RULER scores</span>
+        <span class="n">ruler_rollout_args</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rollout_args</span><span class="p">)</span>
+        <span class="n">ground_truth_is_available</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">PROBABILITY_GROUND_TRUTH_AVAILABLE</span>
+
+        <span class="k">if</span> <span class="n">ground_truth_is_available</span><span class="p">:</span>
+            <span class="c1"># Assuming that ground truth is accessible to RL:</span>
+            <span class="c1"># - set exp's reward to gold reward</span>
+            <span class="c1"># - generate RULER scores for repeat_times, construct ruler_responses</span>
+            <span class="c1"># - return responses + ruler_responses</span>
+
+            <span class="n">judge_success_rate</span><span class="p">,</span> <span class="n">ruler_responses</span><span class="p">,</span> <span class="n">ruler_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ruler_responses</span><span class="p">(</span>
+                <span class="n">responses</span><span class="o">=</span><span class="n">responses</span><span class="p">,</span>
+                <span class="n">judge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>  <span class="c1"># use the policy model itself as judge!</span>
+                <span class="n">ruler_rollout_args</span><span class="o">=</span><span class="n">ruler_rollout_args</span><span class="p">,</span>
+                <span class="n">gold_scores</span><span class="o">=</span><span class="n">gold_scores_scaled</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">response</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">responses</span><span class="p">):</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="n">gold_rewards</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"judge_success"</span><span class="p">:</span> <span class="n">judge_success_rate</span><span class="p">})</span>
+
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">ruler_response</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ruler_responses</span><span class="p">):</span>
+                <span class="c1"># set task_id explicitly, to distinguish two types of experiences!</span>
+                <span class="n">ruler_response</span><span class="o">.</span><span class="n">eid</span><span class="o">.</span><span class="n">task</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">task</span><span class="o">.</span><span class="n">task_id</span><span class="p">)</span> <span class="o">+</span> <span class="s2">"-ruler"</span>
+                <span class="n">ruler_response</span><span class="o">.</span><span class="n">eid</span><span class="o">.</span><span class="n">run</span> <span class="o">=</span> <span class="n">i</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_id_base</span>
+
+            <span class="k">return</span> <span class="n">responses</span> <span class="o">+</span> <span class="n">ruler_responses</span>
+
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span> <span class="o">=</span> <span class="n">DummyProgressBar</span><span class="p">()</span>
+            <span class="c1"># Assuming that ground truth is not accessible to RL:</span>
+            <span class="c1"># - generate RULER scores only once</span>
+            <span class="c1"># - set exp's reward to RULER score</span>
+            <span class="c1"># - return responses</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span><span class="p">)</span>
+            <span class="n">ruler_rollout_args</span><span class="p">[</span><span class="s2">"n"</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">judge_success_rate</span><span class="p">,</span> <span class="n">ruler_responses</span><span class="p">,</span> <span class="n">ruler_scores</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_ruler_responses</span><span class="p">(</span>
+                <span class="n">responses</span><span class="o">=</span><span class="n">responses</span><span class="p">,</span>
+                <span class="n">judge</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>  <span class="c1"># use the policy model itself as judge!</span>
+                <span class="n">ruler_rollout_args</span><span class="o">=</span><span class="n">ruler_rollout_args</span><span class="p">,</span>
+                <span class="n">gold_scores</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="p">)</span>
 
-    <span class="k">def</span><span class="w"> </span><span class="nf">read_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">List</span><span class="p">]:</span>
-        <span class="n">batch</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-        <span class="k">while</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">batch_size</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_samples</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_last</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">break</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-                <span class="k">raise</span> <span class="ne">StopIteration</span>
-            <span class="n">index</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_size</span>
-            <span class="n">batch</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="n">index</span><span class="p">])</span>
-            <span class="n">indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">response</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">responses</span><span class="p">):</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="n">ruler_scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">response</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"judge_success"</span><span class="p">:</span> <span class="n">judge_success_rate</span><span class="p">})</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>
-        <span class="k">return</span> <span class="n">batch</span><span class="p">,</span> <span class="n">indices</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">select_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-        <span class="n">batch</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">indices</span><span class="p">:</span>
-            <span class="k">assert</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_size</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">total_samples</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">drop_last</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">break</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-                <span class="k">raise</span> <span class="ne">StopIteration</span>
-            <span class="n">batch</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">[</span><span class="nb">int</span><span class="p">(</span><span class="n">i</span><span class="p">)])</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">current_offset</span> <span class="o">+=</span> <span class="mi">1</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">progress_bar</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">batch</span><span class="p">))</span>  <span class="c1"># update progress bar</span>
-        <span class="k">return</span> <span class="n">batch</span>
+            <span class="k">return</span> <span class="n">responses</span></div>
 
 
-<div class="viewcode-block" id="BaseFileReader">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.BaseFileReader">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">BaseFileReader</span><span class="p">(</span><span class="n">BufferReader</span><span class="p">):</span>
-<div class="viewcode-block" id="BaseFileReader.read">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.BaseFileReader.read">[docs]</a>
-    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">read</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_sync</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">StopIteration</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">StopAsyncIteration</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span></div>
+<div class="viewcode-block" id="MathTrainableRULERWorkflow.get_ruler_responses">
+<a class="viewcode-back" href="../../../../build_api/trinity.common.workflows.math_trainable_ruler_workflow.html#trinity.common.workflows.math_trainable_ruler_workflow.MathTrainableRULERWorkflow.get_ruler_responses">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_ruler_responses</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">responses</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Experience</span><span class="p">],</span>
+        <span class="n">judge</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">ruler_rollout_args</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
+        <span class="n">gold_scores</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Experience</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">"""Get RULER scores</span>
+<span class="sd">        Returns:</span>
+<span class="sd">            judge_success_rate: float</span>
+<span class="sd">            ruler_responses: List[Experience]</span>
+<span class="sd">            ruler_scores: List[float]</span>
+<span class="sd">        """</span>
+
+        <span class="n">num_responses</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">responses</span><span class="p">)</span>
+
+        <span class="c1"># Step 1: format prompt for judge</span>
+        <span class="n">ruler_system_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"You are a fair judge. The user will provide a question and </span><span class="si">{</span><span class="n">num_responses</span><span class="si">}</span><span class="s2"> candidate solutions to it. Your task is to compare the solutions, see how well they resolve the question, and assign a score within the range [0, 1] for each solution."</span>
+
+        <span class="n">question_prompt</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">"Question: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">task_desc</span><span class="si">}</span><span class="se">\n\n</span><span class="s2">"</span>
+            <span class="sa">f</span><span class="s2">"""Solution format requirement: first think about the reasoning process in the mind and then provides the final answer. The reasoning process and answer are enclosed within &lt;think&gt; &lt;/think&gt; and &lt;answer&gt; &lt;/answer&gt; tags, respectively, i.e.,</span>
+<span class="s2">&lt;think&gt; reasoning process here &lt;/think&gt;</span>
+<span class="s2">&lt;answer&gt; answer here &lt;/answer&gt;."""</span>
+        <span class="p">)</span>
+
+        <span class="n">solutions_prompt_parts</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="sa">f</span><span class="s2">"Candidate solution </span><span class="si">{</span><span class="n">i</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">response</span><span class="o">.</span><span class="n">response_text</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">response</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">responses</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">solutions_prompt</span> <span class="o">=</span> <span class="s2">"</span><span class="se">\n\n</span><span class="s2">"</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">solutions_prompt_parts</span><span class="p">)</span>
+
+        <span class="n">ruler_user_prompt</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">Below is a question and several candidate solutions.</span>
+<span class="si">{</span><span class="n">question_prompt</span><span class="si">}</span>
+<span class="si">{</span><span class="n">solutions_prompt</span><span class="si">}</span>
+<span class="s2">Please assign a score within the range [0, 1] for each of them, reflecting how well they solve the question.</span>
+<span class="s2">You may compare them against each other and think step by step before returning your final scores, but keep your reasoning process brief and concise when possible.</span>
+<span class="s2">Conclude your response with a list of scores, in the following format: [score for solution 1, score for solution 2, ..., score for solution </span><span class="si">{</span><span class="n">num_responses</span><span class="si">}</span><span class="s2">]</span>
+<span class="s2">"""</span>
+
+        <span class="c1"># Step 2: invoke judge LLM (actually self.model), get ruler_responses: List[Experience]</span>
+        <span class="n">messages</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"system"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">ruler_system_prompt</span><span class="p">},</span>
+            <span class="p">{</span><span class="s2">"role"</span><span class="p">:</span> <span class="s2">"user"</span><span class="p">,</span> <span class="s2">"content"</span><span class="p">:</span> <span class="n">ruler_user_prompt</span><span class="p">},</span>
+        <span class="p">]</span>
+        <span class="n">ruler_responses</span> <span class="o">=</span> <span class="n">judge</span><span class="o">.</span><span class="n">chat</span><span class="p">(</span><span class="n">messages</span><span class="p">,</span> <span class="o">**</span><span class="n">ruler_rollout_args</span><span class="p">)</span>
+
+        <span class="c1"># Step 3: extract scores from each ruler_response, and update its reward if needed</span>
+        <span class="n">ruler_scores</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_responses</span><span class="p">)]</span>
+        <span class="n">judge_success_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">ruler_response</span> <span class="ow">in</span> <span class="n">ruler_responses</span><span class="p">:</span>
+            <span class="c1"># default reward is 0; update if gold_scores is provided &amp; judge returns valid scores</span>
+            <span class="n">ruler_response</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="mf">0.0</span>
+            <span class="n">ruler_response_text</span> <span class="o">=</span> <span class="n">ruler_response</span><span class="o">.</span><span class="n">response_text</span>
+            <span class="n">idx1</span><span class="p">,</span> <span class="n">idx2</span> <span class="o">=</span> <span class="n">ruler_response_text</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">"["</span><span class="p">),</span> <span class="n">ruler_response_text</span><span class="o">.</span><span class="n">rfind</span><span class="p">(</span><span class="s2">"]"</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="n">idx1</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">idx2</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">idx1</span> <span class="o">&gt;</span> <span class="n">idx2</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Unable to extract a list from judge response."</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">lst_as_str</span> <span class="o">=</span> <span class="n">ruler_response_text</span><span class="p">[</span><span class="n">idx1</span> <span class="p">:</span> <span class="p">(</span><span class="n">idx2</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">scores</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">literal_eval</span><span class="p">(</span><span class="n">lst_as_str</span><span class="p">)</span>
+                <span class="n">scores</span> <span class="o">=</span> <span class="p">[</span><span class="nb">max</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">score</span><span class="p">))</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="p">]</span>  <span class="c1"># clip to range [0, 1]</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">==</span> <span class="n">num_responses</span><span class="p">:</span>
+                    <span class="n">judge_success_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="n">ruler_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">ruler_scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">scores</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">ruler_scores</span><span class="p">))]</span>
+                    <span class="k">if</span> <span class="n">gold_scores</span><span class="p">:</span>
+                        <span class="n">mae_error</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">scores</span><span class="p">)</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">gold_scores</span><span class="p">))</span><span class="o">.</span><span class="n">mean</span><span class="p">()</span>
+                        <span class="n">ruler_response</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">-</span> <span class="n">mae_error</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">"The length of list in judge response does not match num_responses."</span>
+                    <span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">"Unable to parse the list in judge response."</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">judge_success_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">ruler_scores</span> <span class="o">=</span> <span class="p">[</span><span class="n">score</span> <span class="o">/</span> <span class="n">judge_success_count</span> <span class="k">for</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">ruler_scores</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">ruler_responses</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">judge_success_rate</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">*</span> <span class="n">judge_success_count</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">ruler_responses</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">judge_success_rate</span> <span class="o">=</span> <span class="mf">0.0</span>
+
+        <span class="k">for</span> <span class="n">ruler_response</span> <span class="ow">in</span> <span class="n">ruler_responses</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">ruler_response</span><span class="o">.</span><span class="n">metrics</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">ruler_response</span><span class="o">.</span><span class="n">metrics</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">ruler_response</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"judge_success"</span><span class="p">:</span> <span class="n">judge_success_rate</span><span class="p">})</span>
+            <span class="n">ruler_response</span><span class="o">.</span><span class="n">metrics</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">"reward_for_judge"</span><span class="p">:</span> <span class="n">ruler_response</span><span class="o">.</span><span class="n">reward</span><span class="p">})</span>
+
+        <span class="k">return</span> <span class="n">judge_success_rate</span><span class="p">,</span> <span class="n">ruler_responses</span><span class="p">,</span> <span class="n">ruler_scores</span></div>
 </div>
-
-
-
-<span class="k">class</span><span class="w"> </span><span class="nc">_DatasetFileReader</span><span class="p">(</span><span class="n">BaseFileReader</span><span class="p">):</span>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StorageConfig</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">read_batch_size</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">batch_size</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_formatter_and_dataset</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_init_selector</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_init_formatter_and_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StorageConfig</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_init_selector</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StorageConfig</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">data_selector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">trinity.buffer.selector</span><span class="w"> </span><span class="kn">import</span> <span class="n">SELECTORS</span>
-            <span class="kn">from</span><span class="w"> </span><span class="nn">trinity.buffer.selector.selector</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseSelector</span>
-
-            <span class="bp">self</span><span class="o">.</span><span class="n">selector</span><span class="p">:</span> <span class="n">BaseSelector</span> <span class="o">=</span> <span class="n">SELECTORS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">data_selector</span><span class="o">.</span><span class="n">selector_type</span><span class="p">)(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">data_selector</span>
-            <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">selector</span> <span class="o">=</span> <span class="kc">None</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_read_samples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">,</span> <span class="n">List</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector</span><span class="o">.</span><span class="n">get_indices</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
-            <span class="n">samples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">select_batch</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">samples</span><span class="p">,</span> <span class="n">indices</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">read_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
-        <span class="k">return</span> <span class="p">{</span><span class="s2">"current_index"</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">current_offset</span><span class="p">}</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">selector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">selector</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">current_offset</span> <span class="o">=</span> <span class="n">state_dict</span><span class="p">[</span><span class="s2">"current_index"</span><span class="p">]</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">dataset_size</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_read_sync</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_batch_size</span>
-        <span class="n">samples</span><span class="p">,</span> <span class="n">indices</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_read_samples</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_convert_batch</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">indices</span><span class="p">)</span>
-
-
-<div class="viewcode-block" id="FileReader">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.FileReader">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">FileReader</span><span class="p">(</span><span class="n">BaseFileReader</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Provide a unified interface for Experience and Task file readers."""</span>
-
-<div class="viewcode-block" id="FileReader.__init__">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.FileReader.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StorageConfig</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">schema_type</span> <span class="ow">and</span> <span class="n">config</span><span class="o">.</span><span class="n">schema_type</span> <span class="o">!=</span> <span class="s2">"task"</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">ExperienceFileReader</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">TaskFileReader</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_read_sync</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">batch_size</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">_read_sync</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
-<div class="viewcode-block" id="FileReader.state_dict">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.FileReader.state_dict">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span></div>
-
-
-<div class="viewcode-block" id="FileReader.load_state_dict">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.FileReader.load_state_dict">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">load_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state_dict</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="FileReader.feedback">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.FileReader.feedback">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">feedback</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">pipeline_metrics</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">selector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="n">selector</span><span class="o">.</span><span class="n">feedback</span><span class="p">(</span><span class="o">**</span><span class="n">pipeline_metrics</span><span class="p">)</span></div>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="o">.</span><span class="fm">__len__</span><span class="p">()</span></div>
-
-
-
-<div class="viewcode-block" id="ExperienceFileReader">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.ExperienceFileReader">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">ExperienceFileReader</span><span class="p">(</span><span class="n">_DatasetFileReader</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Reader for SFT / DPO file data."""</span>
-
-<div class="viewcode-block" id="ExperienceFileReader.__init__">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.ExperienceFileReader.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StorageConfig</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_init_formatter_and_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StorageConfig</span><span class="p">):</span>
-        <span class="n">formatter</span> <span class="o">=</span> <span class="n">FORMATTER</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">schema_type</span><span class="p">)(</span>
-            <span class="n">tokenizer_path</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">tokenizer_path</span><span class="p">,</span> <span class="n">format_config</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">format</span>
-        <span class="p">)</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">_HFBatchReader</span><span class="p">(</span>
-            <span class="n">load_dataset</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">subset_name</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">split</span><span class="p">),</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">default_batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_batch_size</span><span class="p">,</span>
-            <span class="n">total_epochs</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">total_epochs</span><span class="p">,</span>
-            <span class="n">drop_last</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">total_steps</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">total_steps</span><span class="p">,</span>
-            <span class="n">enable_progress_bar</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">enable_progress_bar</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">formatter</span><span class="p">,</span> <span class="n">dataset</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-        <span class="n">exp_list</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">samples</span><span class="p">:</span>
-            <span class="n">experience</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
-            <span class="n">exp_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">experience</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">exp_list</span></div>
-
-
-
-<div class="viewcode-block" id="TaskFileReader">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.TaskFileReader">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">TaskFileReader</span><span class="p">(</span><span class="n">_DatasetFileReader</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""A Reader for task file data."""</span>
-
-<div class="viewcode-block" id="TaskFileReader.__init__">
-<a class="viewcode-back" href="../../../../build_api/trinity.buffer.reader.file_reader.html#trinity.buffer.reader.file_reader.TaskFileReader.__init__">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">StorageConfig</span><span class="p">):</span>
-        <span class="n">datasets</span><span class="o">.</span><span class="n">disable_caching</span><span class="p">()</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span></div>
-
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_init_formatter_and_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">):</span>
-        <span class="n">formatter</span> <span class="o">=</span> <span class="n">FORMATTER</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">"task"</span><span class="p">)(</span><span class="n">config</span><span class="p">)</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="n">_HFBatchReader</span><span class="p">(</span>
-            <span class="n">load_dataset</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">subset_name</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">split</span><span class="p">),</span>
-            <span class="n">name</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-            <span class="n">default_batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">read_batch_size</span><span class="p">,</span>
-            <span class="n">total_epochs</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">total_epochs</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">is_eval</span> <span class="k">else</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="n">offset</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
-            <span class="n">drop_last</span><span class="o">=</span><span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">is_eval</span><span class="p">,</span>
-            <span class="n">total_steps</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">total_steps</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">is_eval</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="n">enable_progress_bar</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">enable_progress_bar</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="n">formatter</span><span class="p">,</span> <span class="n">dataset</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_convert_batch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">samples</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span> <span class="n">indices</span><span class="p">:</span> <span class="n">List</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
-        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">sample</span><span class="p">,</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">samples</span><span class="p">,</span> <span class="n">indices</span><span class="p">):</span>
-            <span class="n">task</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">formatter</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
-            <span class="n">task</span><span class="o">.</span><span class="n">index</span><span class="p">[</span><span class="s2">"index"</span><span class="p">]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">index</span><span class="p">)</span>
-            <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">tasks</span></div>
 
 </pre></div>
 
